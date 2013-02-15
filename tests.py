@@ -16,6 +16,9 @@ class AddCopyrightTests (unittest.TestCase):
         self.script = os.path.join(self.directory, 'co.py')
 
     def assertCopyright(self, args, original, expected):
+        # Python 3 expects bytes, so make sure our test strings are UTF-8 bytes.
+        original = original.encode('utf-8')
+        expected = expected.encode('utf-8')
         # Create a test file and call the script on it.
         filename = os.path.join(self.directory, 'output.tmp')
         with open(filename, 'wb') as fp:
