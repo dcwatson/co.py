@@ -45,6 +45,8 @@ def add_copyright(data, args):
         lines[copy_line] = copyright
     else:
         lines.insert(insert_line, copyright)
+        if not args.no_newline:
+            lines.insert(insert_line + 1, line_ending)
     if args.strip:
         for idx in range(len(lines)):
             lines[idx] = lines[idx].rstrip() + DEFAULT_LINE_ENDING
@@ -88,5 +90,6 @@ if __name__ == '__main__':
     parser.add_argument('-p', '--print-only', action='store_true', help='prints which files would be modified without changing them')
     parser.add_argument('-q', '--quiet', action='store_true', help='silence any output')
     parser.add_argument('--check-lines', default=5, type=int, help='number of lines to scan for existing copyright (default: 5)', metavar='num')
+    parser.add_argument('--no-newline', action='store_true', help='do not insert an extra newline after adding a new copyright line')
     parser.add_argument('path', nargs='+', help='a file or directory')
     scan_directories(parser.parse_args())

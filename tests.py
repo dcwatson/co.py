@@ -35,17 +35,17 @@ class AddCopyrightTests (unittest.TestCase):
 
     def test_basic(self):
         original = 'pass'
-        expected = '# Copyright 2020 %s\npass' % self.name
+        expected = '# Copyright 2020 %s\n\npass' % self.name
         self.assertCopyright(['-y', '2020', '-n', self.name, '-b'], original, expected)
 
     def test_shebang(self):
         original = '#!/usr/bin/env python\npass'
-        expected = '#!/usr/bin/env python\n# Copyright %04d %s\npass' % (self.year, self.name)
+        expected = '#!/usr/bin/env python\n# Copyright %04d %s\n\npass' % (self.year, self.name)
         self.assertCopyright(['-n', self.name], original, expected)
 
     def test_coding(self):
         original = '#!/usr/bin/env python\n# -*- coding: utf-8 -*-\npass'
-        expected = '#!/usr/bin/env python\n# -*- coding: utf-8 -*-\n# Copyright %04d %s\npass' % (self.year, self.name)
+        expected = '#!/usr/bin/env python\n# -*- coding: utf-8 -*-\n# Copyright %04d %s\n\npass' % (self.year, self.name)
         self.assertCopyright(['-n', self.name], original, expected)
 
     def test_replace(self):
@@ -65,8 +65,13 @@ class AddCopyrightTests (unittest.TestCase):
 
     def test_comment(self):
         original = 'pass'
-        expected = '// Copyright %04d %s\npass' % (self.year, self.name)
+        expected = '// Copyright %04d %s\n\npass' % (self.year, self.name)
         self.assertCopyright(['-n', self.name, '-c', '//'], original, expected)
+
+    def test_no_newline(self):
+        original = 'pass'
+        expected = '# Copyright %04d %s\npass' % (self.year, self.name)
+        self.assertCopyright(['-n', self.name, '--no-newline'], original, expected)
 
     def test_print_only(self):
         self.assertCopyright(['-y', '2020', '-n', self.name, '-p'], 'pass', 'pass')
