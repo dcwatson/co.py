@@ -50,17 +50,22 @@ class AddCopyrightTests (unittest.TestCase):
 
     def test_replace(self):
         original = '# Copyright 2010 Old Corp\npass'
-        expected = '# Copyright 2010-%04d %s\npass' % (self.year, self.name)
+        expected = '# Copyright %04d %s\npass' % (self.year, self.name)
         self.assertCopyright(['-n', self.name], original, expected)
+
+    def test_update(self):
+        original = '# Copyright 2010 blah blah\r\npass  \r\n'
+        expected = '# Copyright 2010-%04d\r\npass  \r\n' % self.year
+        self.assertCopyright(['-u'], original, expected)
 
     def test_keep_endings(self):
         original = '# Copyright 2010\r\npass  \r\n'
-        expected = '# Copyright 2010-%04d\r\npass  \r\n' % self.year
+        expected = '# Copyright %04d\r\npass  \r\n' % self.year
         self.assertCopyright([], original, expected)
 
     def test_strip(self):
         original = '# Copyright 2010   \rpass    \r\r'
-        expected = '# Copyright 2010-%04d\npass\n\n' % self.year
+        expected = '# Copyright %04d\npass\n\n' % self.year
         self.assertCopyright(['-s'], original, expected)
 
     def test_comment(self):

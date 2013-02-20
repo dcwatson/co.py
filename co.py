@@ -13,13 +13,13 @@ DEFAULT_LINE_ENDING = b'\n'
 coding_regex = re.compile(b'coding[:=]\\s*([-\\w.]+)')
 
 def make_copyright(args, copy_from=None):
-    years = '%04d-%04d' % (copy_from, args.year) if copy_from else '%04d' % args.year
+    years = '%04d-%04d' % (copy_from, args.year) if copy_from and args.update else '%04d' % args.year
     name = ' %s' % args.name if args.name else ''
     return '%s Copyright %s%s' % (args.comment, years, name)
 
 def add_copyright(data, args):
     lines = data.splitlines(True)
-    copyright_regex = re.compile(b'^' + re.escape(args.comment.encode('ascii')) + b'\\s*Copyright\\s+(?:\\(c\\))?\\s*(?P<from>\\d{4})', re.I)
+    copyright_regex = re.compile(b'^' + re.escape(args.comment.encode('ascii')) + b'\\s*Copyright[^\\d]+(?P<from>\\d{4})', re.I)
     copy_line = None
     copy_from = None
     insert_line = 0
@@ -83,6 +83,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-y', '--year', default=current_year, type=int, help='copyright year (default: %s)' % current_year)
     parser.add_argument('-n', '--name', help='copyright holder name')
+    parser.add_argument('-u', '--update', action='store_true', help='updates any existing copyright instead of overwriting')
     parser.add_argument('-e', '--extension', default='py', help='file extension to scan (default: py)', metavar='ext')
     parser.add_argument('-c', '--comment', default='#', help='comment characters (default: #)', metavar='chars')
     parser.add_argument('-s', '--strip', action='store_true', help='strip trailing whitespace and convert line endings to UNIX')
