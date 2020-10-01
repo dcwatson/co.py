@@ -19,13 +19,13 @@ def make_copyright(args, copy_from=None):
     return "%s Copyright %s%s" % (args.comment, years, name)
 
 
-def compile_copyright_regex(comment):
-    return re.compile("^" + re.escape(comment) + r"\s*Copyright[^\d]+(?P<from>\d{4})", re.I)
+def compile_copyright_regex(comment, name):
+    return re.compile("^" + re.escape(comment) + r"\s*Copyright[^\d]+(?P<from>\d{4})" + f" {re.escape(name)}", re.I)
 
 
 def add_copyright(data, args):
     lines = data.splitlines(True)
-    copyright_regex = compile_copyright_regex(args.comment)
+    copyright_regex = compile_copyright_regex(args.comment, args.name)
     copy_line = None
     copy_from = None
     insert_line = 0
@@ -74,24 +74,24 @@ def fix_file(path, args):
 
 
 def check_file(path, args):
-    copyright_regex = compile_copyright_regex(args.comment)
-    
+    copyright_regex = compile_copyright_regex(args.comment, args.name)
+
     with open(path) as fp:
         lines = fp.readlines()
 
     found = False
     for line in lines[: args.check_lines]:
         match = copyright_regex.match(line)
-        
+
         # If copyright exists and is up to date:
-        if match and match.group(1).endswith(str(args.year)):
+        if match and match.groupdict()['from'].endswith(str(args.year)):
             found = True
             break
-    
+
     if not found:
         sys.stdout.write(path)
         sys.stdout.write("\n")
-        
+
     return found
 
 
@@ -129,7 +129,7 @@ if __name__ == "__main__":
         "-y", "--year", default=current_year, type=int, help="copyright year (default: %s)" % current_year
     )
     parser.add_argument("-n", "--name", help="copyright holder name")
-    parser.add_argument("--check", action="store_true", help="Check whether files should be formatted, rather than formatting them.")
+    parser.add_argument("--check", action="store_true", help="Check whether files would be formatted, rather than formatting them.")
     parser.add_argument(
         "-u", "--update", action="store_true", help="updates any existing copyright instead of overwriting"
     )
@@ -154,5 +154,5 @@ if __name__ == "__main__":
         "--no-newline", action="store_true", help="do not insert an extra newline after adding a new copyright line"
     )
     parser.add_argument("path", nargs="+", help="a file or directory")
-    
+
     sys.exit(main(parser.parse_args()))
